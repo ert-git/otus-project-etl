@@ -167,6 +167,38 @@ Info[0].Resource[0].ResourceDesc = const(RTSPArchive)
 Code = $Идентификатор
 ```
 
+#### Пример модели (конфигурация и правила)
+
+```json
+{
+  "id": "www",
+  "name": "www",
+  "delimiter": "",
+  "unmappedFieldName": "",
+  "destUrl": "queue:test",
+  "sourceUrl": "file:///tmp/list.xls",
+  "sourceFilename": "list.xls",
+  "destType": "JMS",
+  "resultType": "JSON",
+  "encoding": "utf-8",
+  "firstRowAsHeader": true,  
+  "rules": [
+    {
+      "left": "Info[0].Resource[0].ResourceDesc",
+      "right": "const(RTSPArchive)"
+    },
+    {
+      "left": "Info[0].Description",
+      "right": "concat(Адрес размещения: , toLower($Название))"
+    },
+    {
+      "left": "Code",
+      "right": "$Идентификатор"
+    }
+  ]
+}
+```
+
 ### Конверторы результата  
 
 Конверторы результата принимают на вход список Extractable строк исходного документа и применяют к ним правила маппинга, возвращая структуру заданного формата.
@@ -204,3 +236,4 @@ Code = $Идентификатор
 ## Веб-интерфейс
 
 ![Веб-интерфейс](maket.png?raw=true "Веб-интерфейс")
+
