@@ -61,8 +61,7 @@ public abstract class BaseCmd implements Cmd {
             lastCmd = cmd;
             m = m.appendReplacement(sb, result);
             m.appendTail(sb);
-            // System.out.println("b: " + sb);
-            // fetch next (wrraping) cmd str
+            // fetch next (wrapping) cmd str
             m = CMD_SIGNATURE.matcher(sb.toString());
         }
 

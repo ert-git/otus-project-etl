@@ -18,8 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <build.outputdir>${project.build.directory}</build.outputdir>
-        <!-- <version.activemq-all>5.14.5</version.activemq-all>
-        -->
     </properties>
     <build>
         <finalName>etl</finalName>
