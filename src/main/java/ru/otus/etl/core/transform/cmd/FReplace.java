@@ -1,25 +1,35 @@
 package ru.otus.etl.core.transform.cmd;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FReplace extends BaseCmd implements Cmd {
+@Slf4j
+public class FReplace extends CmdInterpreter {
+    private static final String message = "Недостаточно аргументов. Синтаксис команды: где_заменить, что_заменить, чем_заменить. Например, replace(кирпич, пич, ка)";
 
-    private List<String> args;
-
-    public String exec(Extractable src) throws EtlTransformException {
-        return args.get(0).replaceAll(args.get(1), args.get(2));
-    }
+    private final String what;
+    private final String where;
+    private final String replacement;
 
     @Override
-    public void setArgs(String args) {
-        this.args = Arrays.stream(args.split(",")).map(el -> el.trim()).collect(Collectors.toList());
+    public String exec(Extractable src) throws EtlTransformException {
+        return where.replaceAll(what, replacement);
+    }
+
+    public FReplace(String arg) throws EtlTransformException {
+        super(arg);
+        try {
+            String[] args = arg.split(",");
+            where = args[0].trim();
+            what = args[1].trim();
+            replacement = args[2].trim();
+        } catch (Exception e) {
+            log.error("ctor: failed for {}", arg, e);
+            throw new EtlTransformException(message);
+        }
     }
 
 }

@@ -5,22 +5,22 @@ import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FFLetterUp extends BaseCmd implements Cmd {
+public class FFLetterUp extends CmdInterpreter {
 
-    private String arg;
+    private final String target;
 
     public static String up1stLetter(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
-
-
-    public String exec(Extractable src) throws EtlTransformException {
-        return up1stLetter(arg);
+        return s.isEmpty() ? "" : s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
     @Override
-    public void setArgs(String arg) {
-        this.arg = arg;
+    public String exec(Extractable src) throws EtlTransformException {
+        return up1stLetter(target);
+    }
+
+    public FFLetterUp(String args) {
+        super(args);
+        this.target = args;
     }
 
 }

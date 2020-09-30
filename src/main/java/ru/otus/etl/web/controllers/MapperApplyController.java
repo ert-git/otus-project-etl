@@ -38,7 +38,7 @@ public class MapperApplyController {
             return new String(b);
         } catch (IOException e) {
             log.error("check: failed for id={}", id, e);
-            throw new EtlException();
+            throw new EtlException("Внутренняя ошибка");
         }
     }
 
@@ -61,7 +61,7 @@ public class MapperApplyController {
                     "attachment; filename=\"" + mapping.getResultFilename() + "\"").body(b);
         } catch (IOException e) {
             log.error("download: failed for id={}", id, e);
-            throw new EtlException();
+            throw new EtlException("Внутренняя ошибка");
         }
     }
 

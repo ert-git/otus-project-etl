@@ -1,26 +1,45 @@
 package ru.otus.etl.core.transform.cmd;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FJoin extends BaseCmd implements Cmd {
+@Slf4j
+public class FJoin extends CmdInterpreter {
+    private static final Pattern ARGS = Pattern.compile("'(.+)'(, ?(.*))+");
+    private static final String message = "Недостаточно аргументов. Синтаксис команды: 'разделитель', префикс ключа. Например, join(',', аргумент1, фргумент2, ...)";
 
-    private String[] args;
+    private final String delimiter;
+    private final String[] els;
 
+    @Override
     public String exec(Extractable src) throws EtlTransformException {
-        String delimiter = args[0].trim().replaceAll("'", "");
-        String[] els = new String[args.length-1];
-        for (int i = 1; i < args.length; i++) {
-            els[i-1] = args[i].trim();
-        }
         return String.join(delimiter, els);
     }
 
-    @Override
-    public void setArgs(String args) {
-        this.args = args.split(",");
+    public FJoin(String arg) throws EtlTransformException {
+        super(arg);
+        try {
+            Matcher matcher = ARGS.matcher(arg);
+            if (matcher.find()) {
+                delimiter = matcher.group(1);
+                String[] args = matcher.group(3).trim().split(",");
+                els = new String[args.length - 1];
+                for (int i = 1; i < args.length; i++) {
+                    els[i - 1] = args[i].trim();
+                }
+            } else {
+                throw new EtlTransformException(message);
+            }
+        } catch (Exception e) {
+            log.error("ctor: failed for {}", arg, e);
+            throw new EtlTransformException(message);
+        }
     }
 
 }

@@ -26,48 +26,41 @@ public class ExcelConverter implements EtlConverter {
 
     public List<Extractable> convert(Mapping mapping, boolean checkOnly) throws ConvertFailedException {
         List<Extractable> list = new ArrayList<>();
-        Workbook workbook = null;
         String url = mapping.getSourceUrl();
         log.info("start converting url={}", url);
         try (InputStream inputStream = new URL(url).openStream()) {
-            if (url.toLowerCase().endsWith("xlsx")) {
-                workbook = new XSSFWorkbook(inputStream);
-            } else {
-                workbook = new HSSFWorkbook(inputStream);
-            }
-            Sheet firstSheet = workbook.getSheetAt(0);
-            Iterator<Row> iterator = firstSheet.iterator();
-            // int totalRowsCount = firstSheet.getPhysicalNumberOfRows();
+            try (Workbook workbook = url.toLowerCase().endsWith("xlsx") ? 
+                    new XSSFWorkbook(inputStream) : new HSSFWorkbook(inputStream)) {
 
-            Map<Integer, String> headers = new HashMap<>();
-            while (iterator.hasNext()) {
-                Row nextRow = iterator.next();
-                if (nextRow.getRowNum() == 0) {
-                    headers = parseHeaders(mapping, nextRow);
-                    if (mapping.isFirstRowAsHeader()) {
-                        continue;
+                Sheet firstSheet = workbook.getSheetAt(0);
+                Iterator<Row> iterator = firstSheet.iterator();
+                // int totalRowsCount = firstSheet.getPhysicalNumberOfRows();
+
+                Map<Integer, String> headers = new HashMap<>();
+                while (iterator.hasNext()) {
+                    Row nextRow = iterator.next();
+                    if (nextRow.getRowNum() == 0) {
+                        headers = parseHeaders(mapping, nextRow);
+                        if (mapping.isFirstRowAsHeader()) {
+                            continue;
+                        }
                     }
-                }
-                ExtractableMap props = new ExtractableMap();
-                list.add(props);
-                Iterator<Cell> cellIterator = nextRow.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell nextCell = cellIterator.next();
-                    int columnIndex = nextCell.getColumnIndex();
-                    props.put(headers.get(columnIndex), getCellValue(nextCell));
-                }
-                if (checkOnly && !list.isEmpty()) {
-                    return list;
+                    ExtractableMap props = new ExtractableMap();
+                    list.add(props);
+                    Iterator<Cell> cellIterator = nextRow.cellIterator();
+                    while (cellIterator.hasNext()) {
+                        Cell nextCell = cellIterator.next();
+                        int columnIndex = nextCell.getColumnIndex();
+                        props.put(headers.get(columnIndex), getCellValue(nextCell));
+                    }
+                    if (checkOnly && !list.isEmpty()) {
+                        return list;
+                    }
                 }
             }
         } catch (Exception e) {
             log.error("convert failed for {}", mapping, e);
             throw new ConvertFailedException(e);
-        } finally {
-            try {
-                workbook.close();
-            } catch (Exception e) {
-            }
         }
         return list;
     }
@@ -119,7 +112,7 @@ public class ExcelConverter implements EtlConverter {
                 }
             }
         } catch (Exception e) {
-            log.error("conver failed for {}", mapping, e);
+            log.error("convert failed for {}", mapping, e);
             throw new ConvertFailedException(e);
         } finally {
             try {

@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.model.Rule;
 import ru.otus.etl.core.transform.EtlTransformException;
-import ru.otus.etl.core.transform.cmd.BaseCmd;
+import ru.otus.etl.core.transform.cmd.CmdInterpreter;
 
 @Slf4j
 public class JsonOutput implements EtlOutput {
@@ -63,10 +63,12 @@ public class JsonOutput implements EtlOutput {
         if (srcDataRecords.size() > 1) {
             buff.append("[");
         }
-        for (int i = 0; i < srcDataRecords.size(); i++) {
+        for (int i = 0, len = srcDataRecords.size(); i < len; i++) {
             Extractable srcDataRec = srcDataRecords.get(i);
             for (Leaf leaf : leafs) {
-                String result = BaseCmd.exec(leaf.func, srcDataRec);
+                long now = System.currentTimeMillis();
+                String result = CmdInterpreter.exec(leaf.func, srcDataRec);
+                log.trace("{} from {}: {} ms", i, len, (System.currentTimeMillis() - now));
                 log.trace("exec func={} for key={}, srcDataRec={} with result={}", leaf.func, leaf.key, srcDataRec, result);
                 leaf.node.put(leaf.key, result);
             }

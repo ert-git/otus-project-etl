@@ -8,10 +8,10 @@ import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FNow extends BaseCmd implements Cmd {
+public class FNow extends CmdInterpreter {
 
-    @Override
-    public void setArgs(String args) {
+    public FNow(String args) {
+        super(args);
     }
 
     @Override

@@ -57,9 +57,11 @@ public class FileUploadController {
             String url = fileService.save(file.getInputStream(), filename);
             mapping.setSourceUrl(url);
             mapping.setSourceFilename(filename);
-            mappingService.saveMapping(mapping);
+            mapping.setHeaders(null);
             EtlConverter conv = ConverterFactory.get(mapping);
             Map<Integer, String> headers = conv.getHeaders(mapping);
+            mapping.setHeaders(String.join(",", headers.values()));
+            mappingService.saveMapping(mapping);
             UploadResponse r = new UploadResponse(headers.values(), mapping);
             return ResponseEntity.ok(r);
         } catch (Exception e) {
