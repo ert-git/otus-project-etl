@@ -8,7 +8,7 @@ import java.util.Set;
 import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.model.Rule;
 import ru.otus.etl.core.transform.EtlTransformException;
-import ru.otus.etl.core.transform.cmd.BaseCmd;
+import ru.otus.etl.core.transform.cmd.CmdInterpreter;
 
 public class ScsvOutput implements EtlOutput {
     private static final String LINE_END = "\r\n";
@@ -30,7 +30,7 @@ public class ScsvOutput implements EtlOutput {
         StringBuilder sb = new StringBuilder();
         for (Extractable rec : srcDataRecs) {
             for (Rule rule : rules) {
-                sb.append(BaseCmd.exec(rule.getRight(), rec)).append(DELIM);
+                sb.append(CmdInterpreter.exec(rule.getRight(), rec)).append(DELIM);
             }
             sb.deleteCharAt(sb.length() - 1).append(LINE_END);
         }

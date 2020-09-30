@@ -51,7 +51,7 @@ public class CsvConverter implements EtlConverter {
                 }
             }
         } catch (Exception e) {
-            log.error("conver failed for {}", mapping, e);
+            log.error("convert failed for {}", mapping, e);
             throw new ConvertFailedException(e);
         }
         return list;
@@ -75,7 +75,7 @@ public class CsvConverter implements EtlConverter {
             }
             return map;
         } catch (Exception e) {
-            log.error("conver failed for {}", mapping, e);
+            log.error("convert failed for {}", mapping, e);
             throw new ConvertFailedException(e);
         }
      }

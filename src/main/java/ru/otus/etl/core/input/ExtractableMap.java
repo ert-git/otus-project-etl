@@ -1,8 +1,12 @@
 package ru.otus.etl.core.input;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.ToString;
 
 public class ExtractableMap implements Extractable {
 
@@ -34,4 +38,11 @@ public class ExtractableMap implements Extractable {
     public String toString() {
         return map.toString();
     }
+
+    @Override
+    public List<String> getList(String prefix) {
+       return map.keySet().stream().filter(key -> key.startsWith(prefix)).map(key -> map.get(key)).collect(Collectors.toList());
+    }
+    
+    
 }

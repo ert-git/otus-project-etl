@@ -191,7 +191,6 @@ header {
 
 .dest-type-JMS,
 .dest-type-FS,
-.source-type-headers,
-.source-type-delim {
+.source-type-specific {
   display: none;
 }

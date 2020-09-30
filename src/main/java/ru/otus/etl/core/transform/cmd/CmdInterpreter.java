@@ -8,23 +8,25 @@ import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @Slf4j
-public abstract class BaseCmd implements Cmd {
-
-    public static String fetchArgs(String cmd) {
-        return cmd.substring(cmd.indexOf('{') + 1, cmd.lastIndexOf('}')).trim();
+public abstract class CmdInterpreter implements Cmd {
+    
+    public CmdInterpreter(String args) {
+        
     }
 
     // get{const{...}}
-    private static Pattern CMD_SIGNATURE = Pattern.compile("(\\w+\\{[^\\{\\}]+\\})");
+    private static final Pattern CMD_SIGNATURE = Pattern.compile("(\\w+\\{[^\\{\\}]+\\})");
 
-    private static final String CMD_PACK = BaseCmd.class.getPackage().getName() + ".";
+    private static final String CMD_PACK = CmdInterpreter.class.getPackage().getName() + ".";
 
-    public static Cmd getCmd(String cmdStr) throws EtlTransformException {
+    public static Cmd getCmd(String singleCmdStr) throws EtlTransformException {
+        String args = singleCmdStr.substring(singleCmdStr.indexOf('{') + 1, singleCmdStr.lastIndexOf('}')).trim();
+        String name = singleCmdStr.substring(0, singleCmdStr.indexOf('{')).trim();
         try {
-            return (Cmd) Class.forName(CMD_PACK + "F" + up1stLetter(cmdStr)).newInstance();
+            return (Cmd) Class.forName(CMD_PACK + "F" + up1stLetter(name)).getConstructor(String.class).newInstance(args);
         } catch (Exception e) {
-            log.error("getCmd: failed for {}", cmdStr, e);
-            throw new EtlTransformException("Команда " + cmdStr + " не поддерживается. Проверьте названия команд по справочнику.");
+            log.error("getCmd: failed for name={}, ({})", name, singleCmdStr, e);
+            throw new EtlTransformException("Команда " + name + " не поддерживается. Проверьте названия команд по справочнику.");
         }
     }
 
@@ -48,16 +50,16 @@ public abstract class BaseCmd implements Cmd {
             // get{smth} / const{smth}
             String singleCmdStr = m.group(1);
             // get / const
-            Cmd cmd = getCmd(fetchCmdName(singleCmdStr));
-            // smth
-            cmd.setArgs(fetchArgs(singleCmdStr));
+            Cmd cmd = getCmd(singleCmdStr);
             log.debug("exec: cmdStr={}, cmd={}", singleCmdStr, cmd);
             String result = cmd.exec(src);
             if (result == null) {
-                throw new EtlTransformException("Ошибка в команде " + singleCmdStr + ". Проверьте синтаксис.");
+                log.warn("exec: cmdStr={}, cmd={}, result={}", singleCmdStr, cmd, result);
+                result = "";
+                //throw new EtlTransformException("Ошибка в команде " + singleCmdStr + ". Проверьте синтаксис.");
+            } else {
+                log.debug("exec: cmdStr={} result={}", singleCmdStr, result);
             }
-
-            log.debug("exec: result={}", result);
             lastCmd = cmd;
             m = m.appendReplacement(sb, result);
             m.appendTail(sb);

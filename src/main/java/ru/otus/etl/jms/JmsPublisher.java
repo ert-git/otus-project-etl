@@ -8,7 +8,6 @@ import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
@@ -20,8 +19,11 @@ import ru.otus.etl.core.EtlException;
 @Component
 public class JmsPublisher {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
+    
+    public JmsPublisher(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     public void sendMessage(final String queueName, final String text) throws EtlException {
         if (queueName == null || queueName.isEmpty()) {

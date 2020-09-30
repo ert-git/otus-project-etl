@@ -9,20 +9,25 @@ import org.springframework.jms.core.JmsTemplate;
 
 @Configuration
 public class JmsConfig {
-    @Value("${spring.activemq.broker-url}")
-    private String BROKER_URL;
-    @Value("${spring.activemq.user}")
-    private String BROKER_USERNAME;
-    @Value("${spring.activemq.password}")
-    private String BROKER_PASSWORD;
-    private int TIMEOUT = 10_000;
+    private final String brokerUrl;
+    private final String brokerUsername;
+    private final String brokerPassword;
+    private final int TIMEOUT = 10_000;
+
+    public JmsConfig(@Value("${spring.activemq.broker-url}") String brokerUrl,
+            @Value("${spring.activemq.user}") String brokerUsername,
+            @Value("${spring.activemq.password}") String brokerPasswd) {
+        this.brokerUrl = brokerUrl;
+        this.brokerUsername = brokerUsername;
+        this.brokerPassword = brokerPasswd;
+    }
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory() {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setBrokerURL(BROKER_URL);
-        connectionFactory.setPassword(BROKER_USERNAME);
-        connectionFactory.setUserName(BROKER_PASSWORD);
+        connectionFactory.setBrokerURL(brokerUrl);
+        connectionFactory.setPassword(brokerUsername);
+        connectionFactory.setUserName(brokerPassword);
         connectionFactory.setConnectResponseTimeout(TIMEOUT);
         return connectionFactory;
     }

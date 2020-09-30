@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,10 +30,12 @@ import ru.otus.etl.utils.Transcriptor;
 @Setter
 @ToString
 public class Mapping {
+    private static final String[] EMPTY_ARR = new String[0];
+
     public static final String FILES_FOLDER = "/tmp";
 
-    private static final Pattern FIELD = Pattern.compile("\\$([\\wА-я ]+)");
-    private static final Pattern GETTER = Pattern.compile("get\\{([\\wА-я ]+)\\}");
+    private static final Pattern FIELD = Pattern.compile("\\$([\\wА-я #/@0-9]+)");
+    private static final Pattern GETTER = Pattern.compile("get\\{([\\wА-я #/@0-9]+)\\}");
 
     public static enum ResultType {
         PROPERTIES, JSON, CSV, SCSV
@@ -54,6 +57,7 @@ public class Mapping {
     @OneToMany(mappedBy = "mapping", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Rule> rules = new ArrayList<>();
     private String delimiter;
+    private String xmlRoot;
     private String unmappedFieldName;
     private String destUrl;
     private String sourceUrl;
@@ -62,6 +66,12 @@ public class Mapping {
     private ResultType resultType;
     private String encoding;
     private boolean firstRowAsHeader;
+    private String headers;
+
+    @JsonIgnore
+    public String[] getHeadersList() {
+        return headers != null && !headers.isEmpty() ? headers.split(",") : EMPTY_ARR;
+    }
 
     @JsonIgnore
     public String getResultFilename() {

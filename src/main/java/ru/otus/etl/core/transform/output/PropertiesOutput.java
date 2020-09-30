@@ -8,7 +8,7 @@ import java.util.Set;
 import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.model.Rule;
 import ru.otus.etl.core.transform.EtlTransformException;
-import ru.otus.etl.core.transform.cmd.BaseCmd;
+import ru.otus.etl.core.transform.cmd.CmdInterpreter;
 
 public class PropertiesOutput implements EtlOutput {
     private static final String DELIM = "=";
@@ -32,7 +32,7 @@ public class PropertiesOutput implements EtlOutput {
         }
         Extractable rec = srcDataRecs.get(0);
         for (Rule rule : rules) {
-            sb.append(rule.getLeft()).append(DELIM).append(BaseCmd.exec(rule.getRight(), rec)).append(LINE_END);
+            sb.append(rule.getLeft()).append(DELIM).append(CmdInterpreter.exec(rule.getRight(), rec)).append(LINE_END);
         }
         return new ByteArrayInputStream(sb.toString().getBytes());
     }

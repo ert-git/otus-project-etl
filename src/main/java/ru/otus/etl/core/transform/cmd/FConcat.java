@@ -5,17 +5,18 @@ import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FConcat extends BaseCmd implements Cmd {
+public class FConcat extends CmdInterpreter {
 
-    private String[] args;
+    private final String[] args;
 
-    public String exec(Extractable src) throws EtlTransformException {
-        return String.join("", args);
+    public FConcat(String args) {
+        super(args);
+        this.args = args.split(",");
     }
 
     @Override
-    public void setArgs(String args) {
-        this.args = args.split(",");
+    public String exec(Extractable src) throws EtlTransformException {
+        return String.join("", args);
     }
 
 }

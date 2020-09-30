@@ -15,6 +15,6 @@ public class ConverterFactory {
         } else if (url.endsWith(".xml")) {
             return new XmlConverter();
         }
-        throw new ConverterNotFoundException();
+        throw new ConverterNotFoundException("Не найден конвертер для " + url);
     }
 }

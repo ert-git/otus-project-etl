@@ -95,6 +95,9 @@ public class MapperMngController {
     @PostMapping(value = "/rules/{id}")
     public Mapping saveRules(@PathVariable("id") String id, @RequestBody Rule[] rules) throws EtlException {
         Mapping mapping = getMapping(id);
+        for (Rule rule : rules) {
+            rule.setMapping(mapping);
+        }
         mapping.setRules(new ArrayList<>(Arrays.asList(rules)));
         mappingService.saveMapping(mapping);
         return mappingService.getMapping(mapping.getId());

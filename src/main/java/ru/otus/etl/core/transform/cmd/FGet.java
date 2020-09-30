@@ -5,20 +5,25 @@ import ru.otus.etl.core.input.Extractable;
 import ru.otus.etl.core.transform.EtlTransformException;
 
 @ToString
-public class FGet extends BaseCmd implements Cmd {
+public class FGet extends CmdInterpreter {
+    private static final String message = "Недостаточно аргументов. Синтаксис команды: название_поля. Например, $название_поля";
 
-    private String arg;
-
-    public String exec(Extractable src) throws EtlTransformException {
-        if (!src.containsKey(arg)) {
-            throw new EtlTransformException("Поле '" + arg + "' не найдено в исходном документе. Проверьте разделители и формат.");
-        }
-        return src.get(arg);
-    }
+    private final String fieldName;
 
     @Override
-    public void setArgs(String arg) {
-        this.arg = arg;
+    public String exec(Extractable src) throws EtlTransformException {
+//        if (!src.containsKey(fieldName)) {
+//            throw new EtlTransformException("Поле '" + fieldName + "' не найдено в исходном документе. Проверьте разделители и формат.");
+//        }
+        return src.get(fieldName);
+    }
+
+    public FGet(String args) throws EtlTransformException {
+        super(args);
+        if (args.isEmpty()) {
+            throw new EtlTransformException(message);
+        }
+        this.fieldName = args;
     }
 
 }
